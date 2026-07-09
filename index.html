@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>写作输入法 · macOS 版 — 专为中文写作的极简五笔系统输入法</title>
+<meta name="description" content="写作输入法 macOS 版：一款纯本地的极简五笔系统输入法。新世纪内核，86/98/08 一键切换，第五码自动上屏、三码预测、快捷造词，不联网、不上传，专注写作。">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<style>
+  :root{
+    --jade:#2A7A6C;
+    --jade-deep:#1E4E44;
+    --jade-soft:#3d9182;
+    --ink:#17241f;
+    --text:#26332e;
+    --text-dim:#5b6a63;
+    --bg:#eef7f2;
+    --bg2:#ffffff;
+    --card:#ffffff;
+    --border:#dce9e2;
+    --hero-glow:radial-gradient(60% 60% at 50% 0%, #d6ede3 0%, rgba(214,237,227,0) 70%);
+    --shadow:0 10px 40px -12px rgba(30,78,68,.28);
+    --shadow-sm:0 4px 18px -8px rgba(30,78,68,.25);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --jade:#4db6a3;
+      --jade-deep:#8fd6c8;
+      --jade-soft:#4db6a3;
+      --ink:#eaf3ef;
+      --text:#d3ddd8;
+      --text-dim:#8ea099;
+      --bg:#0f1a17;
+      --bg2:#12211c;
+      --card:#16241f;
+      --border:#26372f;
+      --hero-glow:radial-gradient(60% 60% at 50% 0%, #123128 0%, rgba(18,49,40,0) 70%);
+      --shadow:0 14px 44px -14px rgba(0,0,0,.6);
+      --shadow-sm:0 6px 22px -10px rgba(0,0,0,.55);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* Nav */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter:saturate(180%) blur(14px);
+    -webkit-backdrop-filter:saturate(180%) blur(14px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;color:var(--ink);font-size:17px}
+  .brand img{width:32px;height:32px}
+  .brand small{font-weight:600;color:var(--jade);font-size:12px;padding:2px 8px;border:1px solid var(--border);border-radius:999px;margin-left:2px}
+  .nav-links{display:flex;align-items:center;gap:26px;font-size:15px;color:var(--text-dim)}
+  .nav-links a:hover{color:var(--jade)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--jade);color:#fff;font-weight:600;font-size:15px;
+    padding:10px 20px;border-radius:11px;border:none;cursor:pointer;
+    box-shadow:var(--shadow-sm);transition:transform .15s ease,filter .15s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+  .btn.ghost{background:transparent;color:var(--jade);border:1px solid var(--jade);box-shadow:none}
+  .nav .btn{padding:8px 16px;font-size:14px}
+  @media(max-width:640px){.nav-links a.hide-sm{display:none}}
+
+  /* Hero */
+  .hero{position:relative;text-align:center;padding:84px 0 60px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:var(--hero-glow);pointer-events:none}
+  .hero-inner{position:relative}
+  .hero .appicon{width:128px;height:128px;margin:0 auto 22px;filter:drop-shadow(0 14px 26px rgba(30,78,68,.26))}
+  .hero h1{font-size:clamp(32px,5.4vw,54px);line-height:1.15;color:var(--ink);font-weight:800;letter-spacing:-.5px}
+  .hero .kicker{color:var(--jade);font-weight:700;font-size:15px;letter-spacing:2px;margin-bottom:16px}
+  .hero p.lead{max-width:680px;margin:22px auto 0;font-size:18px;color:var(--text-dim)}
+  .hero .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+  .hero .meta{margin-top:18px;font-size:13.5px;color:var(--text-dim)}
+  .hero .meta b{color:var(--jade)}
+
+  /* Sections */
+  section{padding:64px 0}
+  .sec-head{text-align:center;margin-bottom:46px}
+  .sec-head .tag{color:var(--jade);font-weight:700;font-size:13px;letter-spacing:2px}
+  .sec-head h2{font-size:clamp(26px,3.6vw,36px);color:var(--ink);font-weight:800;margin-top:8px;letter-spacing:-.3px}
+  .sec-head p{color:var(--text-dim);margin-top:10px;font-size:16px}
+
+  /* Feature grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px 24px;
+    box-shadow:var(--shadow-sm);transition:transform .18s ease,border-color .18s ease;
+  }
+  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--jade) 45%,var(--border))}
+  .card .ic{
+    width:46px;height:46px;border-radius:13px;display:grid;place-items:center;margin-bottom:16px;
+    background:color-mix(in srgb,var(--jade) 14%,transparent);color:var(--jade);
+  }
+  .card .ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .card h3{font-size:18px;color:var(--ink);font-weight:700;margin-bottom:8px}
+  .card p{font-size:14.5px;color:var(--text-dim);line-height:1.65}
+  .card kbd{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+    background:color-mix(in srgb,var(--jade) 12%,transparent);color:var(--jade);
+    padding:1px 7px;border-radius:6px;border:1px solid var(--border);
+  }
+
+  /* Screenshots */
+  .shots{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .shot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  @media(max-width:760px){.shot-grid{grid-template-columns:1fr}}
+  .shot{
+    border-radius:16px;overflow:hidden;box-shadow:var(--shadow);
+    border:1px solid var(--border);background:#e9f3ee;
+  }
+  .shot img{width:100%;height:auto}
+
+  /* Install */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:step}
+  @media(max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.steps{grid-template-columns:1fr}}
+  .step{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 22px;
+    box-shadow:var(--shadow-sm);position:relative;
+  }
+  .step .n{
+    width:34px;height:34px;border-radius:10px;background:var(--jade);color:#fff;
+    display:grid;place-items:center;font-weight:800;font-size:16px;margin-bottom:14px;
+  }
+  .step h4{font-size:16px;color:var(--ink);font-weight:700;margin-bottom:6px}
+  .step p{font-size:14px;color:var(--text-dim)}
+  .step p kbd{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:color-mix(in srgb,var(--jade) 12%,transparent);color:var(--jade);padding:1px 6px;border-radius:5px}
+
+  /* Privacy banner */
+  .privacy{
+    max-width:900px;margin:0 auto;background:var(--card);border:1px solid var(--border);
+    border-radius:20px;padding:38px 34px;box-shadow:var(--shadow-sm);text-align:center;
+  }
+  .privacy .ic{width:54px;height:54px;border-radius:15px;margin:0 auto 16px;display:grid;place-items:center;background:color-mix(in srgb,var(--jade) 14%,transparent);color:var(--jade)}
+  .privacy .ic svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .privacy h2{font-size:26px;color:var(--ink);font-weight:800;margin-bottom:10px}
+  .privacy p{color:var(--text-dim);font-size:16px;max-width:640px;margin:0 auto}
+
+  /* Download CTA band */
+  .download-band{text-align:center;padding:76px 0}
+  .download-band h2{font-size:clamp(28px,4vw,40px);color:var(--ink);font-weight:800;margin-bottom:14px}
+  .download-band p{color:var(--text-dim);font-size:17px;margin-bottom:30px}
+  .download-band .btn{font-size:17px;padding:14px 30px}
+
+  /* Footer */
+  footer{border-top:1px solid var(--border);padding:44px 0;background:var(--bg2)}
+  .foot-inner{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;color:var(--text-dim);font-size:14px}
+  .foot-inner a:hover{color:var(--jade)}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot-brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700}
+  .foot-brand img{width:28px;height:28px}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <img src="assets/icon.png" alt="写作输入法">
+      写作输入法 <small>macOS</small>
+    </a>
+    <nav class="nav-links">
+      <a href="#features" class="hide-sm">功能</a>
+      <a href="#shots" class="hide-sm">截图</a>
+      <a href="#install" class="hide-sm">安装</a>
+      <!-- 占位下载：当前下载文件为 icon.png，替换真安装包时改这两处 href 即可 -->
+      <a class="btn" href="download/icon.png" download>下载 App</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<a id="top"></a>
+<section class="hero">
+  <div class="wrap hero-inner">
+    <img class="appicon" src="assets/icon.png" alt="写作输入法图标">
+    <div class="kicker">专为中文写作的极简五笔</div>
+    <h1>写作输入法 · macOS 版</h1>
+    <p class="lead">一款纯本地的极简五笔<strong>系统输入法</strong>。装入系统即可在任意 App 全局使用：新世纪内核，86 / 98 / 08 一键切换；第五码自动上屏、三码预测、快捷造词，又快又准。不联网、不上传，专注写作。</p>
+    <div class="cta">
+      <a class="btn" href="download/icon.png" download>下载 App</a>
+      <a class="btn ghost" href="#features">了解功能</a>
+    </div>
+    <div class="meta">适用 <b>macOS 13</b> 及以上 · 系统级输入法 · 纯本地运行</div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">核心功能</div>
+      <h2>极简、极速、高效</h2>
+      <p>剔除一切多余设计，只保留写作真正需要的能力</p>
+    </div>
+    <div class="grid">
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div>
+        <h3>系统级输入法</h3>
+        <p>在「系统设置 → 键盘 → 输入法」中添加后，备忘录、文稿、浏览器、代码编辑器等任意 App 全局可用。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
+        <h3>极速输入</h3>
+        <p>第五码自动上屏，每满四码自动成字；首位避重原则让每多打一码首选必更新，长句一气呵成。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg></div>
+        <h3>灵活选词</h3>
+        <p>空格上屏首选，数字键选对应候选；<kbd>;</kbd> 选第二候选、<kbd>'</kbd> 选第三候选，手不离主键区即可命中。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <h3>三码预测</h3>
+        <p>仅输入三码即可智能预测四码词，少打一码也能成词；单击 Shift 切换中英，中英混输顺畅自如。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+        <h3>一键造词</h3>
+        <p>在任意 App 中选中一段文字，按下 <kbd>⌥⌘Y</kbd> 即刻造词入库，常用语、专有名词越写越顺手。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M17 16l2 2 3-3"/></svg></div>
+        <h3>候选随心</h3>
+        <p>双指上滑，把不想要的字词请出候选栏；单指拖动为候选手动排序，顺序长期保存，称手如初。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 5v14M4 9h4M4 13h4"/></svg></div>
+        <h3>强大码表管理</h3>
+        <p>内置全码/树形单字、词组、字符、英文与拼音码表；自建词组、字符、英文码表，表组最多三级嵌套。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h3>拼音反查</h3>
+        <p>忘了某个字怎么打？输入拼音或汉字即可查出对应五笔码，边写边学、边查边记。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div>
+        <h3>隐私与安全</h3>
+        <p>全程本地运算，无需网络权限；输入密码等敏感场景自动切换英文、隐藏候选，安心无忧。</p>
+      </div>
+
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 8l2 12h12l2-12M9 8V5a3 3 0 0 1 6 0v3"/></svg></div>
+        <h3>导入导出 · 迁移无忧</h3>
+        <p>支持 txt 文件与文件夹批量导入，导出留存到本地；切换五笔版本以增量方式合并，个性化设置永不丢失。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREENSHOTS ============ -->
+<section id="shots" class="shots">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">界面一览</div>
+      <h2>清爽的墨玉配色</h2>
+      <p>候选窗跟随光标浮现，管理界面条理分明</p>
+    </div>
+    <div class="shot-grid">
+      <div class="shot"><img src="assets/shot-01.png" alt="专为写作的极简五笔 — 新世纪内核，86/98/08 一键切换" loading="lazy"></div>
+      <div class="shot"><img src="assets/shot-02.png" alt="极速输入，越用越快 — 单击 Shift 切换中英，分号引号选次选" loading="lazy"></div>
+      <div class="shot"><img src="assets/shot-03.png" alt="码表分组，条理分明 — 嵌套、合并、建组、导出" loading="lazy"></div>
+      <div class="shot"><img src="assets/shot-04.png" alt="一键造词，批量导入 — ⌥⌘Y 选中汉字即刻造词入库" loading="lazy"></div>
+      <div class="shot"><img src="assets/shot-05.png" alt="候选随心，隐藏与排序 — 隐藏的码义不再参与输入" loading="lazy"></div>
+      <div class="shot"><img src="assets/shot-06.png" alt="自定义码表，随心定制 — 任意字符，创建专属码字" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSTALL ============ -->
+<section id="install">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">安装步骤</div>
+      <h2>四步启用</h2>
+      <p>系统级输入法，添加后在任意应用全局可用</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <h4>下载并安装</h4>
+        <p>点击「下载 App」，按提示把「写作输入法」安装到系统。</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h4>注销或重启</h4>
+        <p>输入源注册仅在登录时扫描，这一步必须做，之后才能在列表中看到。</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h4>添加输入法</h4>
+        <p>系统设置 → 键盘 → 输入法 → <kbd>＋</kbd> → 简体中文 → 添加「写作输入法」。</p>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <h4>授予辅助功能</h4>
+        <p>系统设置 → 隐私与安全性 → 辅助功能，勾选「写作输入法」，以启用 <kbd>⌥⌘Y</kbd> 造词。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRIVACY ============ -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="privacy">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <h2>你写下的文字，只属于你</h2>
+      <p>写作输入法全程本地运算，不联网、不上传、不索取任何隐私权限。「App 隐私」承诺：不收集任何数据。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOWNLOAD BAND ============ -->
+<section class="download-band">
+  <div class="wrap">
+    <h2>愿它成为你写作路上最顺手的那支笔</h2>
+    <p>极简 · 极速 · 高效 · 纯本地</p>
+    <a class="btn" href="download/icon.png" download>下载 App</a>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot-inner">
+    <div class="foot-brand"><img src="assets/icon.png" alt="">写作输入法 · macOS 版 <span style="font-weight:500;color:var(--text-dim)">v1.0</span></div>
+    <div class="foot-links">
+      <a href="#features">功能</a>
+      <a href="#install">安装</a>
+      <a href="https://xyui-star.github.io/writingime/" target="_blank" rel="noopener">技术支持</a>
+      <a href="https://xyui-star.github.io/writingime/" target="_blank" rel="noopener">隐私政策</a>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:16px;color:var(--text-dim);font-size:13px">© 2026 写作输入法. 专为中文写作而生。</div>
+</footer>
+
+</body>
+</html>
